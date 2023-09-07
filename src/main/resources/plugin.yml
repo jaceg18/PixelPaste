@@ -1,0 +1,10 @@
+name: PixelPaste
+version: '${project.version}'
+main: github.jaceg18.pixelpaste.pixelpaste.PixelPaste
+api-version: 1.18
+authors: [ ftJace ]
+description: Allows for generating pixel art in game based on images.
+commands:
+  pixelpaste:
+    description: Paste a image in pixel art
+    usage: /pixelpaste filename
