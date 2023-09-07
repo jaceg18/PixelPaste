@@ -13,7 +13,7 @@ PixelPaste is a powerful yet lightweight plugin for Minecraft servers, designed 
 - Works with any size of the image, automatically resizing larger images without losing the aspect ratio.
 
 ## Installation
-- Install from link here [placeholder] (or build from repo)
+- Install from link here [[Download](https://www.spigotmc.org/resources/pixelpaste.112531/)] (or build from repo)
 - Place in plugins folder
 - Restart server
 
