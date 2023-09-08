@@ -152,7 +152,7 @@ public class CommandHandler {
             try {
                 max_depth = Integer.parseInt(args[3]);
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored){
-                player.sendMessage("Invalid depth, using default value of 10.");
+                player.sendMessage("Invalid depth, using default value of 5.");
             }
 
 
