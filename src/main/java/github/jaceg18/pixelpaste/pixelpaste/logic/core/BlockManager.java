@@ -1,9 +1,10 @@
-package github.jaceg18.pixelpaste.pixelpaste.logic;
+package github.jaceg18.pixelpaste.pixelpaste.logic.core;
 
-import github.jaceg18.pixelpaste.PixelPaste;
+import github.jaceg18.pixelpaste.pixelpaste.PixelPaste;
 import github.jaceg18.pixelpaste.pixelpaste.player.PendingConfirmation;
-import github.jaceg18.pixelpaste.pixelpaste.utility.MathUtil;
+import github.jaceg18.pixelpaste.pixelpaste.utility.math.MathUtil;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.awt.Color;
@@ -44,6 +45,7 @@ public class BlockManager {
             {135, 107, 98}, {87, 91, 91}, {118, 70, 86}, {74, 60, 91},
             {77, 51, 36}, {76, 83, 42}, {143, 61, 47}, {37, 23, 16}
     };
+
 
     /**
      * Finds the closest matching block Material based on RGB values.
@@ -136,4 +138,22 @@ public class BlockManager {
 
         return closestBlock;
     }
+
+    /**
+     * Helper method for processing
+     * @param image Image to process
+     * @param player Player processing the image
+     * @param x x position
+     * @param z y position
+     * @param startX starting x position
+     * @param startY starting y position
+     * @param startZ starting z position
+     */
+    public static void setBlockType(BufferedImage image, Player player, int x, int z, int startX, int startY, int startZ) {
+        int color = image.getRGB(x, z);
+        Material blockType = BlockManager.getColorBlock(color);
+        Block block = player.getWorld().getBlockAt(startX + x, startY, startZ + z);
+        block.setType(blockType);
+    }
+
 }

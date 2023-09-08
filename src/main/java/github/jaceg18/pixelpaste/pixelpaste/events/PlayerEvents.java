@@ -1,6 +1,6 @@
 package github.jaceg18.pixelpaste.pixelpaste.events;
 
-import github.jaceg18.pixelpaste.pixelpaste.logic.BlockManager;
+import github.jaceg18.pixelpaste.pixelpaste.logic.core.BlockManager;
 import github.jaceg18.pixelpaste.pixelpaste.player.PendingConfirmation;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

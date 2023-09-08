@@ -1,6 +1,6 @@
-package github.jaceg18.pixelpaste;
+package github.jaceg18.pixelpaste.pixelpaste;
 
-import github.jaceg18.pixelpaste.pixelpaste.commands.Handler;
+import github.jaceg18.pixelpaste.pixelpaste.commands.handlers.Handler;
 import github.jaceg18.pixelpaste.pixelpaste.events.PlayerEvents;
 import github.jaceg18.pixelpaste.pixelpaste.player.PendingConfirmation;
 import org.bukkit.command.CommandExecutor;

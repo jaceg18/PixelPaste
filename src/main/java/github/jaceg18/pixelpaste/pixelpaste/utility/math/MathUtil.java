@@ -1,4 +1,4 @@
-package github.jaceg18.pixelpaste.pixelpaste.utility;
+package github.jaceg18.pixelpaste.pixelpaste.utility.math;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

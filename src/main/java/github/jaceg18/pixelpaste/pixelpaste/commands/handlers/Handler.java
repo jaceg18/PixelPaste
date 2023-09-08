@@ -1,4 +1,4 @@
-package github.jaceg18.pixelpaste.pixelpaste.commands;
+package github.jaceg18.pixelpaste.pixelpaste.commands.handlers;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

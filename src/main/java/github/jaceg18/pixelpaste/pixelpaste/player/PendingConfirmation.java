@@ -1,6 +1,6 @@
 package github.jaceg18.pixelpaste.pixelpaste.player;
 
-import github.jaceg18.pixelpaste.PixelPaste;
+import github.jaceg18.pixelpaste.pixelpaste.PixelPaste;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
