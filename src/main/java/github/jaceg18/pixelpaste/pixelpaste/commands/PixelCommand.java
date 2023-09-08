@@ -127,7 +127,7 @@ public class PixelCommand implements CommandExecutor, TabCompleter {
             });
 
         }
-        return false;
+        return true;
     }
 
 

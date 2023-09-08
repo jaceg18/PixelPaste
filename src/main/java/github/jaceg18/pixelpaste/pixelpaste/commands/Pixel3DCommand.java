@@ -138,7 +138,7 @@ public class Pixel3DCommand implements CommandExecutor, TabCompleter {
                 }.runTaskTimer(PixelPaste.getInstance(), 0L, 1L);
             });
         }
-        return false;
+        return true;
     }
 
     public int calculateBlocksPerTick(int imageWidth, int imageHeight, BufferedImage image) {
