@@ -21,9 +21,9 @@ PixelPaste is a powerful yet lightweight plugin for Minecraft servers, designed 
 
 ## Usage
 - This plugin will automatically generate two folders called PixelPaste and PixelPaste3D. Put in PNG or JPG images in inner folders for use.
-- For 2D run the command /pixelpaste filename.PNG
-- For 3D run the command /pixelpaste3D filename.png/.jpg vert/horz
-
+- For 2D run the command /p2d filename.PNG
+- For 3D run the command /p3d filename.png/.jpg vert/horz max_dims max_depth
+ 
 [Updates](https://www.spigotmc.org/resources/pixelpaste.112531/updates)
 
 - This video is outdated...
