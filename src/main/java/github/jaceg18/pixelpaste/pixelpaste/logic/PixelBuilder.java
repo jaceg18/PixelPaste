@@ -1,13 +1,11 @@
 package github.jaceg18.pixelpaste.pixelpaste.logic;
 
-import github.jaceg18.pixelpaste.PixelPaste;
-import github.jaceg18.pixelpaste.pixelpaste.utility.ImageUtil;
 import github.jaceg18.pixelpaste.pixelpaste.utility.MathUtil;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+
 
 import java.awt.image.BufferedImage;
 
