@@ -86,12 +86,12 @@ public class CommandHandler {
                 BufferedImage image;
                 try {
                     image = ImageIO.read(new File(PixelPaste.getInstance().getDataFolder() + "/pixelart/" + args[0]));
+                    image = ImageUtil.resizeImage2D(image, finalMax_dimension);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return;
                 }
 
-                image = ImageUtil.resizeImage2D(image, finalMax_dimension);
 
                 BukkitRunnable runnable = pixelBuilder.process2D(image, player);
 
@@ -162,14 +162,12 @@ public class CommandHandler {
                 BufferedImage image;
                 try {
                     image = ImageIO.read(new File(PixelPaste.getInstance().getDataFolder() + "/pixelart/" + args[0]));
+                    image = ImageUtil.resizeImage3D(image, finalMax_dimension);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return;
                 }
 
-
-
-                image = ImageUtil.resizeImage3D(image, finalMax_dimension);
 
                 BukkitRunnable runnable = pixelBuilder.process3D(player, image, orientation, finalMax_depth);
 
