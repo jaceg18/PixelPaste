@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static github.jaceg18.pixelpaste.pixelpaste.PixelPaste.colorDistance;
+
 public class PixelCommand implements CommandExecutor, TabCompleter {
 
     private File folder;
@@ -202,22 +204,6 @@ public class PixelCommand implements CommandExecutor, TabCompleter {
         }
 
         return closestWool;
-    }
-
-    private double colorDistance(Color color1, Color color2) {
-        int red1 = color1.getRed();
-        int green1 = color1.getGreen();
-        int blue1 = color1.getBlue();
-
-        int red2 = color2.getRed();
-        int green2 = color2.getGreen();
-        int blue2 = color2.getBlue();
-
-        int deltaRed = red1 - red2;
-        int deltaGreen = green1 - green2;
-        int deltaBlue = blue1 - blue2;
-
-        return Math.sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen + deltaBlue * deltaBlue);
     }
 
 
