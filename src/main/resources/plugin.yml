@@ -10,4 +10,4 @@ commands:
     usage: /pixelpaste filename
   pixelpaste3D:
     description: Paste a 3D image in pixel art
-    usage: /pixelpaste3D filename
+    usage: /pixelpaste3D filename (horz/vert)

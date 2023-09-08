@@ -13,7 +13,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -22,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static github.jaceg18.pixelpaste.pixelpaste.PixelPaste.colorDistance;
+import static github.jaceg18.pixelpaste.pixelpaste.PixelPaste.getColorBlock;
 
 public class PixelCommand implements CommandExecutor, TabCompleter {
 
@@ -86,20 +85,19 @@ public class PixelCommand implements CommandExecutor, TabCompleter {
                 int startY = player.getLocation().getBlockY();
                 int startZ = player.getLocation().getBlockZ();
 
-                    int finalImageWidth = imageWidth;
-                    int finalImageHeight = imageHeight;
-                    BufferedImage finalImage = image;
+                int finalImageWidth = imageWidth;
+                int finalImageHeight = imageHeight;
+                BufferedImage finalImage = image;
 
-                    new BukkitRunnable() {
+                new BukkitRunnable() {
                     int x = 0;
                     int z = 0;
 
-                        final int gcdValue = gcd(finalImageWidth, finalImageHeight);
-                        final int blocksPerTick = gcdValue;
+                    final int gcdValue = gcd(finalImageWidth, finalImageHeight);
+                    final int blocksPerTick = gcdValue;
 
                     @Override
                     public void run() {
-                        // Place 10x10 blocks per tick
                         for (int localX = 0; localX < blocksPerTick; localX++) {
                             for (int localZ = 0; localZ < blocksPerTick; localZ++) {
                                 if (x + localX >= finalImageWidth || z + localZ >= finalImageHeight) {
@@ -126,84 +124,18 @@ public class PixelCommand implements CommandExecutor, TabCompleter {
                     }
                 }.runTaskTimer(PixelPaste.getInstance(), 0L, 1L);
 
-        });
+            });
 
+        }
+        return false;
     }
-        return true;
-    }
+
 
     public int gcd(int a, int b) {
         if (b == 0) {
             return a;
         }
         return gcd(b, a % b);
-    }
-
-    private Material getColorBlock(int pixelColor) {
-        int alpha = (pixelColor >> 24) & 0xff;
-        if (alpha == 0) {
-            return Material.AIR;
-        }
-
-        int red = (pixelColor >> 16) & 0xFF;
-        int green = (pixelColor >> 8) & 0xFF;
-        int blue = pixelColor & 0xFF;
-        Color givenColor = new Color(red, green, blue);
-
-        // Define wool colors
-        Material[] woolTypes = {
-                Material.WHITE_WOOL,
-                Material.ORANGE_WOOL,
-                Material.MAGENTA_WOOL,
-                Material.LIGHT_BLUE_WOOL,
-                Material.YELLOW_WOOL,
-                Material.LIME_WOOL,
-                Material.PINK_WOOL,
-                Material.GRAY_WOOL,
-                Material.LIGHT_GRAY_WOOL,
-                Material.CYAN_WOOL,
-                Material.PURPLE_WOOL,
-                Material.BLUE_WOOL,
-                Material.BROWN_WOOL,
-                Material.GREEN_WOOL,
-                Material.RED_WOOL,
-                Material.BLACK_WOOL
-        };
-
-        int[][] woolColors = {
-                {233, 236, 236}, // WHITE
-                {241, 118, 19},  // ORANGE
-                {189, 68, 179},  // MAGENTA
-                {58, 175, 217},  // LIGHT BLUE
-                {248, 197, 39},  // YELLOW
-                {112, 185, 26},  // LIME
-                {237, 141, 172}, // PINK
-                {63, 68, 72},    // GRAY
-                {142, 142, 134}, // LIGHT GRAY
-                {21, 137, 145},  // CYAN
-                {120, 71, 171},  // PURPLE
-                {53, 57, 157},   // BLUE
-                {114, 71, 40},   // BROWN
-                {85, 106, 27},   // GREEN
-                {162, 38, 35},   // RED
-                {20, 21, 26}     // BLACK
-        };
-
-        double closestDistance = Double.MAX_VALUE;
-        Material closestWool = Material.BLACK_WOOL;
-
-        // Loop through wool colors to find the closest match
-        for (int i = 0; i < woolTypes.length; i++) {
-            Color woolColor = new Color(woolColors[i][0], woolColors[i][1], woolColors[i][2]);
-            double distance = colorDistance(givenColor, woolColor);
-
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestWool = woolTypes[i];
-            }
-        }
-
-        return closestWool;
     }
 
 

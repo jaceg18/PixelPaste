@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +41,11 @@ public class Pixel3DCommand implements CommandExecutor, TabCompleter {
         if (player.isOp() || player.hasPermission("pixelpaste")) {
             if (args.length < 1) {
                 player.sendMessage("You must provide an image filename.");
+                return false;
+            }
+            String orientation = args[1].toLowerCase();
+            if (!orientation.equals("vert") && !orientation.equals("horz")) {
+                player.sendMessage("Invalid orientation. Use 'vert' for vertical or 'horz' for horizontal.");
                 return false;
             }
 
@@ -77,50 +83,54 @@ public class Pixel3DCommand implements CommandExecutor, TabCompleter {
                     image = resizedImage;
                 }
 
-                int imageWidth = image.getWidth();
-                int imageHeight = image.getHeight();
+
+                // Dimensions
+                int finalImageWidth = image.getWidth();
+                int finalImageHeight = image.getHeight();
 
                 int startX = player.getLocation().getBlockX();
                 int startY = player.getLocation().getBlockY();
                 int startZ = player.getLocation().getBlockZ();
 
-                BufferedImage finalImage = image;
-                BufferedImage finalImage1 = image;
 
-                int blocksPerTick = calculateBlocksPerTick(imageWidth, imageHeight);
-                BufferedImage finalImage2 = image;
+                int blocksPerTick = calculateBlocksPerTick(finalImageWidth, finalImageHeight, image);
+
+                BufferedImage finalImage = image;
                 new BukkitRunnable() {
                     int x = 0;
-                    int z = 0;
+                    int y = 0;
 
                     @Override
                     public void run() {
-                        // Place blocks based on blocksPerTick
                         for (int localX = 0; localX < blocksPerTick; localX++) {
-                            for (int localZ = 0; localZ < blocksPerTick; localZ++) {
-                                if (x + localX >= imageWidth || z + localZ >= imageHeight) {
+                            for (int localY = 0; localY < blocksPerTick; localY++) {
+                                if (x + localX >= finalImageWidth || y + localY >= finalImageHeight) {
                                     cancel();
                                     return;
                                 }
 
-                                int color = finalImage2.getRGB(x + localX, z + localZ);
-                                Object[] result = getColorBlock3D(color);
-                                Material blockType = (Material) result[0];
-                                int depth = (Integer) result[1];
+                                int color = finalImage.getRGB(x + localX, y + localY);
+                                Object[] blockInfo = getColorBlock3D(color);
+                                Material blockType = (Material) blockInfo[0];
+                                int depth = (int) blockInfo[1];
 
-                                // Loop through y-axis based on brightness (depth)
-                                for (int localY = 0; localY <= depth; localY++) {
-                                    Block block = player.getWorld().getBlockAt(startX + x + localX, startY + localY, startZ + z + localZ);
+                                for (int localZ = 0; localZ <= depth; localZ++) {
+                                    Block block;
+                                    if ("vert".equals(orientation)) {
+                                        block = player.getWorld().getBlockAt(startX + x + localX, startY + finalImageHeight - 1 - (y + localY), startZ + localZ);
+                                    } else { // horz
+                                        block = player.getWorld().getBlockAt(startX + x + localX, startY - depth, startZ + y + localY);
+                                    }
                                     block.setType(blockType);
                                 }
                             }
                         }
 
                         x += blocksPerTick;
-                        if (x >= imageWidth) {
+                        if (x >= finalImageWidth) {
                             x = 0;
-                            z += blocksPerTick;
-                            if (z >= imageHeight) {
+                            y += blocksPerTick;
+                            if (y >= finalImageHeight) {
                                 cancel();
                             }
                         }
@@ -128,27 +138,50 @@ public class Pixel3DCommand implements CommandExecutor, TabCompleter {
                 }.runTaskTimer(PixelPaste.getInstance(), 0L, 1L);
             });
         }
-        return true;
+        return false;
     }
 
-    public int calculateBlocksPerTick(int imageWidth, int imageHeight) {
-        // Finding the greatest common divisor (GCD)
+    public int calculateBlocksPerTick(int imageWidth, int imageHeight, BufferedImage image) {
+        // Calculate the GCD
         int gcd = 1;
-        for(int i = 1; i <= imageWidth && i <= imageHeight; i++) {
-            if(imageWidth % i == 0 && imageHeight % i == 0)
+        for (int i = 1; i <= imageWidth && i <= imageHeight; i++) {
+            if (imageWidth % i == 0 && imageHeight % i == 0) {
                 gcd = i;
+            }
         }
 
-        // You can use the gcd directly as blocksPerTick, or you can calculate it in some other way
-        // For example, you might want to divide it by some value to get a smaller number
+        // Base blocksPerTick
         int blocksPerTick = gcd;
 
-        // Optional: if blocksPerTick is too large, you can set a maximum limit
-        if (blocksPerTick > 50) {
-            blocksPerTick = 50; // or any other max limit you prefer
+        // Set a maximum limit
+        blocksPerTick = Math.min(blocksPerTick, 50);
+
+        // Calculate average brightness
+        int averageBrightness = calculateAverageBrightness(image);
+
+        // Adjust blocksPerTick based on brightness
+        if (averageBrightness > 200) {
+            blocksPerTick = Math.min(blocksPerTick, 30);  // Slower for brighter images
+        } else {
+            // You can optionally speed up for darker images
+            // For example, increase by 10% for darker images
+            blocksPerTick = (int) Math.min(blocksPerTick * 1.1, 50);
         }
 
         return blocksPerTick;
+    }
+    private int calculateAverageBrightness(BufferedImage image) {
+        long totalBrightness = 0;
+        int pixelCount = 0;
+
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                totalBrightness += getBrightness(image.getRGB(x, y));
+                pixelCount++;
+            }
+        }
+
+        return (int) (totalBrightness / pixelCount);
     }
     private Object[] getColorBlock3D(int pixelColor) {
         // Extract the RGB and Alpha components from the pixel color
@@ -156,17 +189,10 @@ public class Pixel3DCommand implements CommandExecutor, TabCompleter {
         if (alpha == 0) {
             return new Object[]{Material.AIR, 0};
         }
-
-        int red = (pixelColor >> 16) & 0xFF;
-        int green = (pixelColor >> 8) & 0xFF;
-        int blue = pixelColor & 0xFF;
-
         // Calculate luminance in a way that mimics human perception
-        double luminance = 0.299 * red + 0.587 * green + 0.114 * blue;
-        int depth = (int) Math.round(luminance * 10 / 255);
+        int depth = getDepth(pixelColor);
 
         // Your color matching logic here (same as before)
-        Color givenColor = new Color(red, green, blue);
         Material closestWool = getColorBlock(pixelColor); // Reusing your existing method
 
         return new Object[]{closestWool, depth};
@@ -197,6 +223,8 @@ public class Pixel3DCommand implements CommandExecutor, TabCompleter {
                     suggestions.add(file.getName());
                 }
             }
+        } else if (args.length == 2) {
+            return Arrays.asList("vert", "horz");
         }
         return suggestions;
     }
