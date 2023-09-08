@@ -1,82 +1,18 @@
-package github.jaceg18.pixelpaste.pixelpaste;
+package github.jaceg18.pixelpaste.pixelpaste.logic;
 
-import github.jaceg18.pixelpaste.pixelpaste.commands.Pixel3DCommand;
-import github.jaceg18.pixelpaste.pixelpaste.commands.PixelCommand;
+import github.jaceg18.pixelpaste.pixelpaste.player.PendingConfirmation;
+import github.jaceg18.pixelpaste.pixelpaste.utility.MathUtil;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.awt.*;
-import java.io.File;
-import java.util.Objects;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
 
-public final class PixelPaste extends JavaPlugin {
-
-    private static PixelPaste instance;
-
-
-    /**
-     * Executed when the plugin is enabled.
-     */
-    @Override
-    public void onEnable() {
-        initializeFolders(new String[]{"/pixelart", "/pixelart3D"});
-
-        PixelCommand pixelCommand = new PixelCommand(getFolder("/pixelart"));
-        setCommandExecutor("pixelpaste", pixelCommand);
-
-        Pixel3DCommand pixel3DCommand = new Pixel3DCommand(getFolder("/pixelart3D"));
-        setCommandExecutor("pixelpaste3D", pixel3DCommand);
-
-        instance = this;
-    }
-
-
-    /**
-     * Creates or loads folders
-     * @param folderPaths The path to the folders
-     */
-    private void initializeFolders(String[] folderPaths) {
-        for (String path : folderPaths) {
-            File folder = getFolder(path);
-            if (!folder.exists()) {
-                getServer().getConsoleSender().sendMessage(folder.mkdirs() ? "Image folders created" : "(CRITICAL) Failed to create image folders");
-            }
-        }
-    }
-
-
-    /**
-     * Gets the folder as a file object.
-     * @param path Path to folder
-     * @return Folder file
-     */
-    private File getFolder(String path) {
-        return new File(getDataFolder() + path);
-    }
-
-
-    /**
-     * Sets the command executors
-     * @param commandName The name of the command
-     * @param executor The executor to set
-     */
-    private void setCommandExecutor(String commandName, CommandExecutor executor) {
-        Objects.requireNonNull(this.getCommand(commandName)).setExecutor(executor);
-        Objects.requireNonNull(this.getCommand(commandName)).setTabCompleter((TabCompleter) executor);
-    }
-
-
-    /**
-     * Gets the singleton instance of this class.
-     *
-     * @return the singleton instance.
-     */
-    public static PixelPaste getInstance() {
-        return instance;
-    }
-
+public class BlockManager {
 
     /**
      * Finds the closest matching block Material based on RGB values.
@@ -133,7 +69,7 @@ public final class PixelPaste extends JavaPlugin {
 
         for (int i = 0; i < blockTypes.length; i++) {
             Color blockColor = new Color(blockColors[i][0], blockColors[i][1], blockColors[i][2]);
-            double distance = colorDistance(givenColor, blockColor);
+            double distance = MathUtil.colorDistance(givenColor, blockColor);
 
             if (distance < closestDistance) {
                 closestDistance = distance;
@@ -146,26 +82,70 @@ public final class PixelPaste extends JavaPlugin {
 
 
     /**
-     * Calculates the distance between two colors.
+     * Returns the corresponding block type and depth for a given pixel color in 3D pixel art.
      *
-     * @param color1 the first Color object.
-     * @param color2 the second Color object.
-     * @return the distance between the two colors.
+     * @param pixelColor The color of the pixel.
+     * @return An Object array containing the closest Material match and the depth.
      */
-    public static double colorDistance(Color color1, Color color2) {
-        int red1 = color1.getRed();
-        int green1 = color1.getGreen();
-        int blue1 = color1.getBlue();
+    public static Object[] getColorBlock3D(int pixelColor) {
+        int alpha = (pixelColor >> 24) & 0xff;
+        if (alpha == 0) {
+            return new Object[]{Material.AIR, 0};
+        }
 
-        int red2 = color2.getRed();
-        int green2 = color2.getGreen();
-        int blue2 = color2.getBlue();
+        int depth = MathUtil.getDepth(pixelColor);
+        Material closestWool = getColorBlock(pixelColor);
 
-        int deltaRed = red1 - red2;
-        int deltaGreen = green1 - green2;
-        int deltaBlue = blue1 - blue2;
-
-        return Math.sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen + deltaBlue * deltaBlue);
+        return new Object[]{closestWool, depth};
     }
 
+
+    /**
+     * Highlights a given selection
+     * @param image The image being translated
+     * @param initialLocation the initial location of the build
+     */
+    public static void highlightArea(Player player, BufferedImage image, Location initialLocation, String orientation) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        int startX = initialLocation.getBlockX();
+        int startY = initialLocation.getBlockY();
+        int startZ = initialLocation.getBlockZ();
+
+        World world = initialLocation.getWorld();
+        HashMap<Location, Material> original = new HashMap<>();
+
+        if ("vert".equals(orientation)) {
+            // Vertical
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    Location loc = new Location(world, startX + x, startY + y, startZ);
+                    original.put(loc, loc.getBlock().getType());
+                    if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+                        loc.getBlock().setType(Material.GLASS);
+                    } else {
+                        loc.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        } else {
+            // Horizontal
+            for (int x = 0; x < width; x++) {
+                for (int z = 0; z < height; z++) {
+                    Location loc = new Location(world, startX + x, startY, startZ + z);
+                    original.put(loc, loc.getBlock().getType());
+                    if (x == 0 || x == width - 1 || z == 0 || z == height - 1) {
+                        loc.getBlock().setType(Material.GLASS);
+                    } else {
+                        loc.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
+        // Store original blocks
+        PendingConfirmation.storeOriginalBlocks(player.getUniqueId(), original);
+
+    }
 }

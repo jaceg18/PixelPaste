@@ -1,13 +1,13 @@
 name: PixelPaste
 version: '${project.version}'
-main: github.jaceg18.pixelpaste.pixelpaste.PixelPaste
+main: github.jaceg18.pixelpaste.PixelPaste
 api-version: 1.18
 authors: [ ftJace ]
 description: Allows for generating pixel art in game based on images.
 commands:
-  pixelpaste:
+  p2d:
     description: Paste a image in pixel art
-    usage: /pixelpaste filename
-  pixelpaste3D:
+    usage: /p2d filename.png/.jpg
+  p3d:
     description: Paste a 3D image in pixel art
-    usage: /pixelpaste3D filename (horz/vert) (max_depth)
+    usage: /p3d filename.png/.jpg vert/horz
