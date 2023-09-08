@@ -71,7 +71,16 @@ public class CommandHandler {
                 return false;
             }
 
+            int max_dimension = 100;
+            try {
+                max_dimension = Integer.parseInt(args[1]);
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored){
+                player.sendMessage("Invalid dimension, using default value of 10.");
+            }
+
             // Load the image asynchronously
+            int finalMax_dimension = max_dimension;
+
             Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {
                 // Initialize variables
                 BufferedImage image;
@@ -82,7 +91,7 @@ public class CommandHandler {
                     return;
                 }
 
-                image = ImageUtil.resizeImage2D(image);
+                image = ImageUtil.resizeImage2D(image, finalMax_dimension);
 
                 BukkitRunnable runnable = pixelBuilder.process2D(image, player);
 
@@ -130,7 +139,14 @@ public class CommandHandler {
                 return false;
             }
 
+            int max_dimension = 100;
+            try {
+                max_dimension = Integer.parseInt(args[2]);
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored){
+                player.sendMessage("Invalid dimension, using default value of 10.");
+            }
 
+            int finalMax_dimension = max_dimension;
             Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {
                 // Initialize variables
                 BufferedImage image;
@@ -141,7 +157,7 @@ public class CommandHandler {
                     return;
                 }
 
-                image = ImageUtil.resizeImage3D(image);
+                image = ImageUtil.resizeImage3D(image, finalMax_dimension);
 
                 BukkitRunnable runnable = pixelBuilder.process3D(player, image, orientation);
 

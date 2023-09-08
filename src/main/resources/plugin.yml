@@ -10,4 +10,4 @@ commands:
     usage: /p2d filename.png/.jpg
   p3d:
     description: Paste a 3D image in pixel art
-    usage: /p3d filename.png/.jpg vert/horz
+    usage: /p3d filename.png/.jpg vert/horz max_dimension_size

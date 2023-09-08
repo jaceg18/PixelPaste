@@ -11,7 +11,7 @@ public class ImageUtil {
      * @param image The image to resize
      * @return the resized image
      */
-    public static BufferedImage resizeImage2D(BufferedImage image) {
+    public static BufferedImage resizeImage2D(BufferedImage image, int maxDimension) {
         double aspectRatio = (double) image.getWidth() / image.getHeight();
         int newWidth, newHeight;
 
@@ -19,10 +19,10 @@ public class ImageUtil {
         int imageHeight = image.getHeight();
 
         if (imageWidth > imageHeight) {
-            newWidth = 100;
+            newWidth = maxDimension;
             newHeight = (int) (newWidth / aspectRatio);
         } else {
-            newHeight = 100;
+            newHeight = maxDimension;
             newWidth = (int) (newHeight * aspectRatio);
         }
 
@@ -39,19 +39,18 @@ public class ImageUtil {
      * @param image The image to resize
      * @return the resized image
      */
-    public static BufferedImage resizeImage3D(BufferedImage image) {
+    public static BufferedImage resizeImage3D(BufferedImage image, int maxDimension) {
         int originalWidth = image.getWidth();
         int originalHeight = image.getHeight();
 
-        // Resize if larger than 100x100
-        if (originalWidth > 100 || originalHeight > 100) {
+        if (originalWidth > maxDimension || originalHeight > maxDimension) {
             double aspectRatio = (double) originalWidth / originalHeight;
 
-            int newWidth = Math.min(100, originalWidth);
+            int newWidth = Math.min(maxDimension, originalWidth);
             int newHeight = (int) (newWidth / aspectRatio);
 
-            if (newHeight > 100) {
-                newHeight = 100;
+            if (newHeight > maxDimension) {
+                newHeight = maxDimension;
                 newWidth = (int) (newHeight * aspectRatio);
             }
 
@@ -66,4 +65,5 @@ public class ImageUtil {
         }
         return image;
     }
+
 }

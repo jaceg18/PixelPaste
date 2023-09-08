@@ -6,7 +6,6 @@ import github.jaceg18.pixelpaste.pixelpaste.utility.MathUtil;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
-import java.awt.*;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
