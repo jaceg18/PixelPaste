@@ -147,6 +147,16 @@ public class CommandHandler {
             }
 
             int finalMax_dimension = max_dimension;
+
+            int max_depth = 5;
+            try {
+                max_depth = Integer.parseInt(args[3]);
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored){
+                player.sendMessage("Invalid depth, using default value of 10.");
+            }
+
+
+            int finalMax_depth = max_depth;
             Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {
                 // Initialize variables
                 BufferedImage image;
@@ -157,9 +167,11 @@ public class CommandHandler {
                     return;
                 }
 
+
+
                 image = ImageUtil.resizeImage3D(image, finalMax_dimension);
 
-                BukkitRunnable runnable = pixelBuilder.process3D(player, image, orientation);
+                BukkitRunnable runnable = pixelBuilder.process3D(player, image, orientation, finalMax_depth);
 
                 BufferedImage finalImage = image;
                 Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {

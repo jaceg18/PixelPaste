@@ -63,7 +63,7 @@ public class PixelBuilder {
      * @param player The player pasting
      * @return A runnable method that will be called on confirmation
      */
-    public BukkitRunnable process3D(Player player, BufferedImage image, String orientation) {
+    public BukkitRunnable process3D(Player player, BufferedImage image, String orientation, int max_depth) {
 
         int finalImageWidth = image.getWidth();
         int finalImageHeight = image.getHeight();
@@ -89,7 +89,7 @@ public class PixelBuilder {
                         }
 
                         int color = finalImage.getRGB(x + localX, y + localY);
-                        Object[] blockInfo = getColorBlock3D(color);
+                        Object[] blockInfo = getColorBlock3D(color, max_depth);
                         Material blockType = (Material) blockInfo[0];
                         int depth = (int) blockInfo[1];
 

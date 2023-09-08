@@ -87,13 +87,13 @@ public class BlockManager {
      * @param pixelColor The color of the pixel.
      * @return An Object array containing the closest Material match and the depth.
      */
-    public static Object[] getColorBlock3D(int pixelColor) {
+    public static Object[] getColorBlock3D(int pixelColor, int max_depth) {
         int alpha = (pixelColor >> 24) & 0xff;
         if (alpha == 0) {
             return new Object[]{Material.AIR, 0};
         }
 
-        int depth = MathUtil.getDepth(pixelColor);
+        int depth = MathUtil.getDepth(pixelColor, max_depth);
         Material closestWool = getColorBlock(pixelColor);
 
         return new Object[]{closestWool, depth};

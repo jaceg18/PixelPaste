@@ -34,13 +34,13 @@ public class MathUtil {
      * @param pixelColor The color of the pixel.
      * @return The depth of the color based on its luminance.
      */
-    public static int getDepth(int pixelColor) {
+    public static int getDepth(int pixelColor, int max_depth) {
         int r = (pixelColor >> 16) & 0xFF;
         int g = (pixelColor >> 8) & 0xFF;
         int b = pixelColor & 0xFF;
 
         double luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-        return (int)(luminance / 256.0 * 5); // 5 blocks max
+        return (int)(luminance / 256.0 * max_depth); // 5 blocks max
     }
 
 

@@ -60,6 +60,10 @@ public class Handler extends CommandHandler implements CommandExecutor, TabCompl
             }
         } else if (args.length == 2 && command.getName().equalsIgnoreCase("p3d")) {
             return Arrays.asList("vert", "horz");
+        } else if (args.length == 3 && command.getName().equalsIgnoreCase("p3d")){
+            return Arrays.asList("10", "max_dimension_size");
+        } else if (args.length == 4 && command.getName().equalsIgnoreCase("p3d")){
+            return Arrays.asList("5", "max_depth");
         }
         return suggestions;
     }
