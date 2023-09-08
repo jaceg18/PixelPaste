@@ -29,4 +29,4 @@ PixelPaste is an advanced yet lightweight Minecraft server plugin, meticulously 
 - For the latest updates and fixes, visit Spigot Updates.
 
 ### 📺 Demo Video
-- 🚨 Note: [This Demo Video](https://www.spigotmc.org/resources/pixelpaste-%EF%B8%8F.112531/) is outdated. However, it provides a good introduction to the plugin's basic functionalities.
+- 🚨 Note: [This Demo Video](https://www.youtube.com/watch?v=cJWXCN86Dbk&feature=youtu.be) is outdated. However, it provides a good introduction to the plugin's basic functionalities.
