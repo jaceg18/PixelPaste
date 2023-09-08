@@ -24,7 +24,7 @@ PixelPaste is a powerful yet lightweight plugin for Minecraft servers, designed 
 - For 2D run the command /pixelpaste filename.PNG
 - For 3D run the command /pixelpaste3D filename.png/.jpg vert/horz
 
-![A-minecraft-plugin-called-PixelPaste---logo-]([https://github.com/jaceg18/PixelPaste/assets/94592538/b4416e1c-330a-4a3b-ae1d-ca5792b6bf0f](https://www.spigotmc.org/resources/pixelpaste.112531/updates))
+[Updates](https://www.spigotmc.org/resources/pixelpaste.112531/updates)
 
 - This video is outdated...
 [Demo Video](https://youtu.be/cJWXCN86Dbk)
