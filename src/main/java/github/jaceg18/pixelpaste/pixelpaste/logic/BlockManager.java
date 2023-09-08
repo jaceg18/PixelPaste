@@ -138,29 +138,4 @@ public class BlockManager {
 
         return closestBlock;
     }
-
-    private static void iterateArea(int width, int height, Location initialLocation, String orientation, Consumer<Location> action) {
-        int startX = initialLocation.getBlockX();
-        int startY = initialLocation.getBlockY();
-        int startZ = initialLocation.getBlockZ();
-        World world = initialLocation.getWorld();
-
-        if ("vert".equals(orientation)) {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    action.accept(new Location(world, startX + x, startY + y, startZ));
-                }
-            }
-        } else {
-            for (int x = 0; x < width; x++) {
-                for (int z = 0; z < height; z++) {
-                    action.accept(new Location(world, startX + x, startY, startZ + z));
-                }
-            }
-        }
-    }
-
-    private static boolean isEdge(int x, int y, int width, int height) {
-        return x == 0 || x == width - 1 || y == 0 || y == height - 1;
-    }
 }

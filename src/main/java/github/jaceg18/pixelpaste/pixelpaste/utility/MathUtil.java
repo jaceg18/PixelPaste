@@ -12,19 +12,9 @@ public class MathUtil {
      * @return the distance between the two colors.
      */
     public static double colorDistance(Color color1, Color color2) {
-        int red1 = color1.getRed();
-        int green1 = color1.getGreen();
-        int blue1 = color1.getBlue();
-
-        int red2 = color2.getRed();
-        int green2 = color2.getGreen();
-        int blue2 = color2.getBlue();
-
-        int deltaRed = red1 - red2;
-        int deltaGreen = green1 - green2;
-        int deltaBlue = blue1 - blue2;
-
-        return Math.sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen + deltaBlue * deltaBlue);
+        return Math.sqrt(Math.pow(color1.getRed() - color2.getRed(), 2) +
+                Math.pow(color1.getGreen() - color2.getGreen(), 2) +
+                Math.pow(color1.getBlue() - color2.getBlue(), 2));
     }
 
 
@@ -34,15 +24,20 @@ public class MathUtil {
      * @param pixelColor The color of the pixel.
      * @return The depth of the color based on its luminance.
      */
-    public static int getDepth(int pixelColor, int max_depth) {
-        int r = (pixelColor >> 16) & 0xFF;
-        int g = (pixelColor >> 8) & 0xFF;
-        int b = pixelColor & 0xFF;
-
-        double luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-        return (int)(luminance / 256.0 * max_depth); // 5 blocks max
+    public static int getDepth(int pixelColor, int maxDepth) {
+        return (int) (calculateLuminance(pixelColor) / 256.0 * maxDepth);
     }
 
+    /**
+     * Calculates the luminance of the pixel color
+     * @param pixelColor The pixel color
+     * @return The luminance as a double
+     */
+    private static double calculateLuminance(int pixelColor) {
+        return 0.2126 * ((pixelColor >> 16) & 0xFF) +
+                0.7152 * ((pixelColor >> 8) & 0xFF) +
+                0.0722 * (pixelColor & 0xFF);
+    }
 
     /**
      * Compute the Greatest Common Divisor (GCD) between two numbers.
@@ -59,35 +54,16 @@ public class MathUtil {
     /**
      * Calculates the optimal number of blocks to render per tick based on the image's dimensions and brightness.
      *
-     * @param imageWidth The width of the image.
-     * @param imageHeight The height of the image.
+     * @param width The width of the image.
+     * @param height The height of the image.
      * @param image The BufferedImage object.
      * @return The optimal number of blocks to be rendered per tick.
      */
-    public static int calculateBlocksPerTick(int imageWidth, int imageHeight, BufferedImage image) {
-        // Calculate the Greatest Common Divisor (GCD) of imageWidth and imageHeight.
-        int gcd = 1;
-        for (int i = 1; i <= imageWidth && i <= imageHeight; i++) {
-            if (imageWidth % i == 0 && imageHeight % i == 0) {
-                gcd = i;
-            }
-        }
-
-        // Initialize blocksPerTick with the GCD value.
-        int blocksPerTick = gcd;
-
-        // Cap blocksPerTick at a maximum of 50.
-        blocksPerTick = Math.min(blocksPerTick, 50);
-
-        // Calculate the average brightness of the image.
-        int averageBrightness = calculateAverageBrightness(image);
-
-        // Adjust blocksPerTick based on image brightness.
-        blocksPerTick = (averageBrightness > 200)
-                ? Math.min(blocksPerTick, 30)
-                : (int) Math.min(blocksPerTick * 1.1, 50);
-
-        return blocksPerTick;
+    public static int calculateBlocksPerTick(int width, int height, BufferedImage image) {
+        int gcd = gcd(width, height);
+        int blocksPerTick = Math.min(gcd, 50);
+        int avgBrightness = calculateAverageBrightness(image);
+        return avgBrightness > 200 ? Math.min(blocksPerTick, 30) : (int) Math.min(blocksPerTick * 1.1, 50);
     }
 
     /**
@@ -98,15 +74,12 @@ public class MathUtil {
      */
     private static int calculateAverageBrightness(BufferedImage image) {
         long totalBrightness = 0;
-        int pixelCount = 0;
-
+        int pixelCount = image.getWidth() * image.getHeight();
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 totalBrightness += getBrightness(image.getRGB(x, y));
-                pixelCount++;
             }
         }
-
         return (int) (totalBrightness / pixelCount);
     }
 
@@ -116,11 +89,9 @@ public class MathUtil {
      * @param pixelColor The color of the pixel.
      * @return The brightness level of the pixel.
      */
-    static int getBrightness(int pixelColor) {
-        int red = (pixelColor >> 16) & 0xFF;
-        int green = (pixelColor >> 8) & 0xFF;
-        int blue = pixelColor & 0xFF;
-
-        return (int) Math.round(0.299 * red + 0.587 * green + 0.114 * blue);
+    private static int getBrightness(int pixelColor) {
+        return (int) Math.round(0.299 * ((pixelColor >> 16) & 0xFF) +
+                0.587 * ((pixelColor >> 8) & 0xFF) +
+                0.114 * (pixelColor & 0xFF));
     }
 }

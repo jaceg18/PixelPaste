@@ -19,23 +19,32 @@ public class PlayerEvents implements Listener {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
-        String message = e.getMessage();
+        String message = e.getMessage().toLowerCase();
 
-        if ("ppconfirm".equalsIgnoreCase(message)) {
-            boolean success = PendingConfirmation.confirmAndRun(player);
-            if (success) {
-                BlockManager.restoreOriginalBlocks(player);
-                PendingConfirmation.removeOriginalBlocks(player.getUniqueId());
-                player.sendMessage(ChatColor.GOLD + "PixelPaste: Building started!");
-                e.setCancelled(true);
-            }
-        } else if ("ppcancel".equalsIgnoreCase(message)) {
-            if ((player.isOp() || player.hasPermission("pixelpaste")) && PendingConfirmation.hasPendingConfirmation(player)) {
-                player.sendMessage(ChatColor.GOLD + "PixelPaste: You have canceled your build query.");
-                PendingConfirmation.removeConfirmation(player);
-                BlockManager.restoreOriginalBlocks(player);
-                PendingConfirmation.removeOriginalBlocks(player.getUniqueId());
-                e.setCancelled(true);
+        if (message.equals("ppconfirm") || message.equals("ppcancel")) {
+            handlePixelPasteCommands(player, message);
+            e.setCancelled(true);
+        }
+    }
+
+    /**
+     * Helper method for handling the paste confirmations
+     * @param player The player executing the confirmation
+     * @param message The confirmation
+     */
+    private void handlePixelPasteCommands(Player player, String message) {
+        if (player.isOp() || player.hasPermission("pixelpaste")) {
+            if (message.equals("ppconfirm")) {
+                if (PendingConfirmation.confirmAndRun(player)) {
+                    BlockManager.restoreOriginalBlocks(player);
+                    player.sendMessage(ChatColor.GOLD + "PixelPaste: Building started!");
+                }
+            } else if (message.equals("ppcancel")) {
+                if (PendingConfirmation.hasPendingConfirmation(player)) {
+                    player.sendMessage(ChatColor.GOLD + "PixelPaste: You have canceled your build query.");
+                    PendingConfirmation.removeConfirmation(player);
+                    BlockManager.restoreOriginalBlocks(player);
+                }
             }
         }
     }
