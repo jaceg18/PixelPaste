@@ -7,7 +7,7 @@ description: Allows for generating pixel art in game based on images.
 commands:
   p2d:
     description: Paste a image in pixel art
-    usage: /p2d filename.(png, jpg)
+    usage: /p2d filename.(png, jpg) (max_dimension_size/or leave blank for default)
   p3d:
     description: Paste a 3D image in pixel art
     usage: /p3d filename.(png,jpg) (vert/horz) (max_dimension_size) (max_depth_size)

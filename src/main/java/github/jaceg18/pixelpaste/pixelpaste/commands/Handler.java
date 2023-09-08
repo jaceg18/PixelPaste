@@ -51,20 +51,57 @@ public class Handler extends CommandHandler implements CommandExecutor, TabCompl
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         List<String> suggestions = new ArrayList<>();
-        if (args.length == 1) {
-            File[] files = imageFolder.listFiles((dir, name) -> name.endsWith(".png") || name.endsWith(".jpg"));
-            if (files != null) {
-                for (File file : files) {
-                    suggestions.add(file.getName());
-                }
+        String cmdName = command.getName().toLowerCase();
+
+
+        if ("p3d".equals(cmdName)) {
+            if (args.length == 1) {
+                handleFileTabComplete(suggestions);
+            } else {
+                handleP3DTabComplete(args, suggestions);
             }
-        } else if (args.length == 2 && command.getName().equalsIgnoreCase("p3d")) {
-            return Arrays.asList("vert", "horz");
-        } else if (args.length == 3 && command.getName().equalsIgnoreCase("p3d")){
-            return Arrays.asList("100", "max_dimension_size");
-        } else if (args.length == 4 && command.getName().equalsIgnoreCase("p3d")){
-            return Arrays.asList("5", "max_depth");
+        } else if ("p2d".equals(cmdName)) {
+            if (args.length == 1) {
+                handleFileTabComplete(suggestions);
+            } else if (args.length == 2) {
+                suggestions.addAll(Arrays.asList("100", "max_dimension_size"));
+            }
         }
+
         return suggestions;
+    }
+
+    /**
+     * Handles the tab complete for p3d command
+     * @param args The commandline args
+     * @param suggestions The suggestions
+     */
+    private void handleP3DTabComplete(String[] args, List<String> suggestions) {
+        switch (args.length) {
+            case 2:
+                suggestions.addAll(Arrays.asList("vert", "horz"));
+                break;
+            case 3:
+                suggestions.addAll(Arrays.asList("100", "max_dimension_size"));
+                break;
+            case 4:
+                suggestions.addAll(Arrays.asList("5", "max_depth"));
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Completes the file tab complete
+     * @param suggestions the files
+     */
+    private void handleFileTabComplete(List<String> suggestions) {
+        File[] files = imageFolder.listFiles((dir, name) -> name.endsWith(".png") || name.endsWith(".jpg"));
+        if (files != null) {
+            for (File file : files) {
+                suggestions.add(file.getName());
+            }
+        }
     }
 }

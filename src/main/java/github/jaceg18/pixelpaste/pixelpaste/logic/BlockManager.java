@@ -11,8 +11,41 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class BlockManager {
+
+
+    private static final Material[] BLOCK_TYPES = {
+            Material.WHITE_WOOL, Material.ORANGE_WOOL, Material.MAGENTA_WOOL, Material.LIGHT_BLUE_WOOL,
+            Material.YELLOW_WOOL, Material.LIME_WOOL, Material.PINK_WOOL, Material.GRAY_WOOL,
+            Material.LIGHT_GRAY_WOOL, Material.CYAN_WOOL, Material.PURPLE_WOOL, Material.BLUE_WOOL,
+            Material.BROWN_WOOL, Material.GREEN_WOOL, Material.RED_WOOL, Material.BLACK_WOOL,
+            Material.WHITE_CONCRETE, Material.ORANGE_CONCRETE, Material.MAGENTA_CONCRETE, Material.LIGHT_BLUE_CONCRETE,
+            Material.YELLOW_CONCRETE, Material.LIME_CONCRETE, Material.PINK_CONCRETE, Material.GRAY_CONCRETE,
+            Material.LIGHT_GRAY_CONCRETE, Material.CYAN_CONCRETE, Material.PURPLE_CONCRETE, Material.BLUE_CONCRETE,
+            Material.BROWN_CONCRETE, Material.GREEN_CONCRETE, Material.RED_CONCRETE, Material.BLACK_CONCRETE,
+            Material.WHITE_TERRACOTTA, Material.ORANGE_TERRACOTTA, Material.MAGENTA_TERRACOTTA, Material.LIGHT_BLUE_TERRACOTTA,
+            Material.YELLOW_TERRACOTTA, Material.LIME_TERRACOTTA, Material.PINK_TERRACOTTA, Material.GRAY_TERRACOTTA,
+            Material.LIGHT_GRAY_TERRACOTTA, Material.CYAN_TERRACOTTA, Material.PURPLE_TERRACOTTA, Material.BLUE_TERRACOTTA,
+            Material.BROWN_TERRACOTTA, Material.GREEN_TERRACOTTA, Material.RED_TERRACOTTA, Material.BLACK_TERRACOTTA
+
+    };
+
+    private static final int[][] BLOCK_COLORS = {
+            {233, 236, 236}, {241, 118, 19}, {189, 68, 179}, {58, 175, 217},
+            {248, 197, 39}, {112, 185, 26}, {237, 141, 172}, {63, 68, 72},
+            {142, 142, 134}, {21, 137, 145}, {120, 71, 171}, {53, 57, 157},
+            {114, 71, 40}, {85, 106, 27}, {162, 38, 35}, {20, 21, 26},
+            {210, 210, 210}, {225, 97, 0}, {170, 48, 159}, {35, 137, 198},
+            {241, 175, 21}, {94, 169, 24}, {214, 101, 143}, {48, 48, 48},
+            {125, 125, 115}, {21, 119, 136}, {101, 32, 157}, {45, 47, 143},
+            {96, 60, 31}, {73, 91, 36}, {142, 33, 33}, {8, 10, 15},
+            {209, 177, 161}, {162, 84, 38}, {150, 88, 109}, {113, 109, 138},
+            {186, 133, 35}, {104, 118, 53}, {162, 78, 79}, {58, 42, 36},
+            {135, 107, 98}, {87, 91, 91}, {118, 70, 86}, {74, 60, 91},
+            {77, 51, 36}, {76, 83, 42}, {143, 61, 47}, {37, 23, 16}
+    };
 
     /**
      * Finds the closest matching block Material based on RGB values.
@@ -23,61 +56,12 @@ public class BlockManager {
      * @return the closest matching Material.
      */
     public static Material getColorBlock(int pixelColor) {
-        int alpha = (pixelColor >> 24) & 0xff;
-        if (alpha == 0) {
+        if (((pixelColor >> 24) & 0xff) == 0) {
             return Material.AIR;
         }
 
-        int red = (pixelColor >> 16) & 0xFF;
-        int green = (pixelColor >> 8) & 0xFF;
-        int blue = pixelColor & 0xFF;
-        Color givenColor = new Color(red, green, blue);
-
-        Material[] blockTypes = {
-                Material.WHITE_WOOL, Material.ORANGE_WOOL, Material.MAGENTA_WOOL, Material.LIGHT_BLUE_WOOL,
-                Material.YELLOW_WOOL, Material.LIME_WOOL, Material.PINK_WOOL, Material.GRAY_WOOL,
-                Material.LIGHT_GRAY_WOOL, Material.CYAN_WOOL, Material.PURPLE_WOOL, Material.BLUE_WOOL,
-                Material.BROWN_WOOL, Material.GREEN_WOOL, Material.RED_WOOL, Material.BLACK_WOOL,
-                Material.WHITE_CONCRETE, Material.ORANGE_CONCRETE, Material.MAGENTA_CONCRETE, Material.LIGHT_BLUE_CONCRETE,
-                Material.YELLOW_CONCRETE, Material.LIME_CONCRETE, Material.PINK_CONCRETE, Material.GRAY_CONCRETE,
-                Material.LIGHT_GRAY_CONCRETE, Material.CYAN_CONCRETE, Material.PURPLE_CONCRETE, Material.BLUE_CONCRETE,
-                Material.BROWN_CONCRETE, Material.GREEN_CONCRETE, Material.RED_CONCRETE, Material.BLACK_CONCRETE,
-                Material.WHITE_TERRACOTTA, Material.ORANGE_TERRACOTTA, Material.MAGENTA_TERRACOTTA, Material.LIGHT_BLUE_TERRACOTTA,
-                Material.YELLOW_TERRACOTTA, Material.LIME_TERRACOTTA, Material.PINK_TERRACOTTA, Material.GRAY_TERRACOTTA,
-                Material.LIGHT_GRAY_TERRACOTTA, Material.CYAN_TERRACOTTA, Material.PURPLE_TERRACOTTA, Material.BLUE_TERRACOTTA,
-                Material.BROWN_TERRACOTTA, Material.GREEN_TERRACOTTA, Material.RED_TERRACOTTA, Material.BLACK_TERRACOTTA
-
-        };
-
-        int[][] blockColors = {
-                {233, 236, 236}, {241, 118, 19}, {189, 68, 179}, {58, 175, 217},
-                {248, 197, 39}, {112, 185, 26}, {237, 141, 172}, {63, 68, 72},
-                {142, 142, 134}, {21, 137, 145}, {120, 71, 171}, {53, 57, 157},
-                {114, 71, 40}, {85, 106, 27}, {162, 38, 35}, {20, 21, 26},
-                {210, 210, 210}, {225, 97, 0}, {170, 48, 159}, {35, 137, 198},
-                {241, 175, 21}, {94, 169, 24}, {214, 101, 143}, {48, 48, 48},
-                {125, 125, 115}, {21, 119, 136}, {101, 32, 157}, {45, 47, 143},
-                {96, 60, 31}, {73, 91, 36}, {142, 33, 33}, {8, 10, 15},
-                {209, 177, 161}, {162, 84, 38}, {150, 88, 109}, {113, 109, 138},
-                {186, 133, 35}, {104, 118, 53}, {162, 78, 79}, {58, 42, 36},
-                {135, 107, 98}, {87, 91, 91}, {118, 70, 86}, {74, 60, 91},
-                {77, 51, 36}, {76, 83, 42}, {143, 61, 47}, {37, 23, 16}
-        };
-
-        double closestDistance = Double.MAX_VALUE;
-        Material closestBlock = Material.BLACK_WOOL;
-
-        for (int i = 0; i < blockTypes.length; i++) {
-            Color blockColor = new Color(blockColors[i][0], blockColors[i][1], blockColors[i][2]);
-            double distance = MathUtil.colorDistance(givenColor, blockColor);
-
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestBlock = blockTypes[i];
-            }
-        }
-
-        return closestBlock;
+        Color givenColor = new Color((pixelColor >> 16) & 0xFF, (pixelColor >> 8) & 0xFF, pixelColor & 0xFF);
+        return findClosestBlock(givenColor);
     }
 
 
@@ -87,16 +71,15 @@ public class BlockManager {
      * @param pixelColor The color of the pixel.
      * @return An Object array containing the closest Material match and the depth.
      */
-    public static Object[] getColorBlock3D(int pixelColor, int max_depth) {
-        int alpha = (pixelColor >> 24) & 0xff;
-        if (alpha == 0) {
+    public static Object[] getColorBlock3D(int pixelColor, int maxDepth) {
+        if (((pixelColor >> 24) & 0xff) == 0) {
             return new Object[]{Material.AIR, 0};
         }
 
-        int depth = MathUtil.getDepth(pixelColor, max_depth);
-        Material closestWool = getColorBlock(pixelColor);
+        int depth = MathUtil.getDepth(pixelColor, maxDepth);
+        Material closestBlock = getColorBlock(pixelColor);
 
-        return new Object[]{closestWool, depth};
+        return new Object[]{closestBlock, depth};
     }
 
 
@@ -108,48 +91,24 @@ public class BlockManager {
     public static void highlightArea(Player player, BufferedImage image, Location initialLocation, String orientation) {
         int width = image.getWidth();
         int height = image.getHeight();
-
-        int startX = initialLocation.getBlockX();
-        int startY = initialLocation.getBlockY();
-        int startZ = initialLocation.getBlockZ();
-
         World world = initialLocation.getWorld();
         HashMap<Location, Material> original = new HashMap<>();
 
-        // Schedule a synchronous task to modify blocks
         Bukkit.getScheduler().runTask(PixelPaste.getInstance(), () -> {
-            if ("vert".equals(orientation)) {
-                // Vertical
-                for (int x = 0; x < width; x++) {
-                    for (int y = 0; y < height; y++) {
-                        Location loc = new Location(world, startX + x, startY + y, startZ);
-                        original.put(loc, loc.getBlock().getType());
-                        if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
-                            loc.getBlock().setType(Material.GLASS);
-                        } else {
-                            loc.getBlock().setType(Material.AIR);
-                        }
-                    }
-                }
-            } else {
-                // Horizontal
-                for (int x = 0; x < width; x++) {
-                    for (int z = 0; z < height; z++) {
-                        Location loc = new Location(world, startX + x, startY, startZ + z);
-                        original.put(loc, loc.getBlock().getType());
-                        if (x == 0 || x == width - 1 || z == 0 || z == height - 1) {
-                            loc.getBlock().setType(Material.GLASS);
-                        } else {
-                            loc.getBlock().setType(Material.AIR);
-                        }
-                    }
+            for (int x = 0; x < width; x++) {
+                for (int yz = 0; yz < height; yz++) {
+                    int[] coords = ("vert".equals(orientation)) ? new int[]{x, yz, 0} : new int[]{x, 0, yz};
+                    Location loc = initialLocation.clone().add(coords[0], coords[1], coords[2]);
+                    original.put(loc, world.getBlockAt(loc).getType());
+
+                    Material newType = (x == 0 || x == width - 1 || yz == 0 || yz == height - 1) ? Material.GLASS : Material.AIR;
+                    world.getBlockAt(loc).setType(newType);
                 }
             }
-
-            // Store original blocks
             PendingConfirmation.storeOriginalBlocks(player.getUniqueId(), original);
         });
     }
+
 
 
 
@@ -158,14 +117,50 @@ public class BlockManager {
         HashMap<Location, Material> originalBlocks = PendingConfirmation.getOriginalBlocks(playerId);
 
         Bukkit.getScheduler().runTask(PixelPaste.getInstance(), () -> {
-            for (Map.Entry<Location, Material> entry : originalBlocks.entrySet()) {
-                Location loc = entry.getKey();
-                Material originalMaterial = entry.getValue();
-                loc.getBlock().setType(originalMaterial);
-            }
+            originalBlocks.forEach((loc, originalMaterial) -> loc.getBlock().setType(originalMaterial));
         });
 
-        // Remove the stored blocks to free up memory
         PendingConfirmation.removeOriginalBlocks(playerId);
+    }
+    private static Material findClosestBlock(Color givenColor) {
+        double closestDistance = Double.MAX_VALUE;
+        Material closestBlock = Material.BLACK_WOOL;
+
+        for (int i = 0; i < BLOCK_TYPES.length; i++) {
+            Color blockColor = new Color(BLOCK_COLORS[i][0], BLOCK_COLORS[i][1], BLOCK_COLORS[i][2]);
+            double distance = MathUtil.colorDistance(givenColor, blockColor);
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestBlock = BLOCK_TYPES[i];
+            }
+        }
+
+        return closestBlock;
+    }
+
+    private static void iterateArea(int width, int height, Location initialLocation, String orientation, Consumer<Location> action) {
+        int startX = initialLocation.getBlockX();
+        int startY = initialLocation.getBlockY();
+        int startZ = initialLocation.getBlockZ();
+        World world = initialLocation.getWorld();
+
+        if ("vert".equals(orientation)) {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    action.accept(new Location(world, startX + x, startY + y, startZ));
+                }
+            }
+        } else {
+            for (int x = 0; x < width; x++) {
+                for (int z = 0; z < height; z++) {
+                    action.accept(new Location(world, startX + x, startY, startZ + z));
+                }
+            }
+        }
+    }
+
+    private static boolean isEdge(int x, int y, int width, int height) {
+        return x == 0 || x == width - 1 || y == 0 || y == height - 1;
     }
 }

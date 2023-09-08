@@ -37,154 +37,96 @@ public class CommandHandler {
     public boolean onCommand(@NotNull CommandSender sender, Command command, @NotNull String label, String[] args){
         String name = command.getName().toLowerCase();
         if (name.equals("p2d")){
-            return on2DCommand(sender, args);
+            return handleCommand(sender, args, true);
         } else
             if (name.equals("p3d")){
-            return on3DCommand(sender, args);
+            return handleCommand(sender, args, false);
         }
 
             return false;
     }
+
     /**
-     * Handles the 2D pixel art command.
-     *
-     * @param sender The sender of the command.
-     * @param args Arguments provided with the command.
-     * @return true if the command was successfully handled; false otherwise.
+     * Handles the 2D/3D image processing and commands
+     * @param sender The command sender
+     * @param args The command line arguments
+     * @param is2D Is the build 2D?
+     * @return A boolean whether the command was successful
      */
-    private boolean on2DCommand(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Your not a player.");
-            return false;
-        }
-
-        Player player = (Player) sender;
-
-        Location initialLocation = player.getLocation().clone();
-
-        // Check for proper permissions
-        if (player.isOp() || player.hasPermission("pixelpaste")) {
-
-            // Check for filename argument
-            if (args.length < 1) {
-                player.sendMessage("You must provide an image filename.");
-                return false;
-            }
-
-            int max_dimension = 100;
-            try {
-                max_dimension = Integer.parseInt(args[1]);
-            } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored){
-                player.sendMessage("Invalid dimension, using default value of 10.");
-            }
-
-            // Load the image asynchronously
-            int finalMax_dimension = max_dimension;
-
-            Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {
-                // Initialize variables
-                BufferedImage image;
-                try {
-                    image = ImageIO.read(new File(PixelPaste.getInstance().getDataFolder() + "/pixelart/" + args[0]));
-                    image = ImageUtil.resizeImage2D(image, finalMax_dimension);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
-
-
-                BukkitRunnable runnable = pixelBuilder.process2D(image, player);
-
-                BufferedImage finalImage = image;
-                Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {
-                    // Add the runnable to pending confirmations
-                    PendingConfirmation.addConfirmation(player, runnable);
-
-                    // Highlight the area
-                    BlockManager.highlightArea(player, finalImage, initialLocation, "horz");
-
-                    // Notify the player to confirm
-                    player.sendMessage(ChatColor.GOLD + "PixelPaste: Area highlighted. Type /ppconfirm to proceed with building, /ppcancel to cancel");
-                });
-            });
-
-        }
-        return true;
-    }
-    /**
-     * Handles the 3D pixel art command.
-     *
-     * @param sender The sender of the command.
-     * @param args Arguments provided with the command.
-     * @return true if the command was successfully handled; false otherwise.
-     */
-    private boolean on3DCommand(CommandSender sender, String[] args){
+    private boolean handleCommand(CommandSender sender, String[] args, boolean is2D) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players can use this command.");
             return false;
         }
 
         Player player = (Player) sender;
-
-        Location initialLocation = player.getLocation().clone();
-
-        if (player.isOp() || player.hasPermission("pixelpaste")) {
-            if (args.length < 1) {
-                player.sendMessage("You must provide an image filename.");
-                return false;
-            }
-            String orientation = args[1].toLowerCase();
-            if (!orientation.equals("vert") && !orientation.equals("horz")) {
-                player.sendMessage(ChatColor.RED + "PixelPaste: Invalid orientation. Use 'vert' for vertical or 'horz' for horizontal.");
-                return false;
-            }
-
-            int max_dimension = 100;
-            try {
-                max_dimension = Integer.parseInt(args[2]);
-            } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored){
-                player.sendMessage("Invalid dimension, using default value of 10.");
-            }
-
-            int finalMax_dimension = max_dimension;
-
-            int max_depth = 5;
-            try {
-                max_depth = Integer.parseInt(args[3]);
-            } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored){
-                player.sendMessage("Invalid depth, using default value of 5.");
-            }
-
-
-            int finalMax_depth = max_depth;
-            Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {
-                // Initialize variables
-                BufferedImage image;
-                try {
-                    image = ImageIO.read(new File(PixelPaste.getInstance().getDataFolder() + "/pixelart/" + args[0]));
-                    image = ImageUtil.resizeImage3D(image, finalMax_dimension);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
-
-
-                BukkitRunnable runnable = pixelBuilder.process3D(player, image, orientation, finalMax_depth);
-
-                BufferedImage finalImage = image;
-                Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {
-                    // Add the runnable to pending confirmations
-                    PendingConfirmation.addConfirmation(player, runnable);
-
-                    // Highlight the area
-                    BlockManager.highlightArea(player, finalImage, initialLocation, orientation);
-
-                    // Notify the player to confirm
-                    player.sendMessage(ChatColor.GOLD + "PixelPaste: Area highlighted. Type 'ppconfirm' to proceed with building, 'ppcancel' to cancel");
-                });
-            });
+        if (!player.isOp() && !player.hasPermission("pixelpaste")) {
+            sender.sendMessage("You don't have permission to use this command.");
+            return false;
         }
+
+        if (args.length < 1) {
+            player.sendMessage("You must provide an image filename.");
+            return false;
+        }
+
+        int maxDimension = parseDimension(args, 1, 100);
+        int maxDepth = is2D ? 0 : parseDimension(args, 3, 5);
+        String orientation = is2D ? "horz" : args[1].toLowerCase();
+
+        if (!is2D && !("vert".equals(orientation) || "horz".equals(orientation))) {
+            player.sendMessage("Invalid orientation. Use 'vert' for vertical or 'horz' for horizontal.");
+            return false;
+        }
+
+        processImageAsync(player, args[0], maxDimension, maxDepth, orientation, is2D);
         return true;
+    }
+
+    /**
+     * Parses dimensions while keeping error checking in mind
+     * @param args The commandline arguments
+     * @param index The given arg index
+     * @param defaultValue The default value incase of failure
+     * @return the parsed value
+     */
+    private int parseDimension(String[] args, int index, int defaultValue) {
+        try {
+            return Integer.parseInt(args[index]);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Processes the images
+     * @param player The player processing the image
+     * @param filename The filename of the image
+     * @param maxDimension The max dimension of the image
+     * @param maxDepth The max depth of the image
+     * @param orientation The orientation of the image
+     * @param is2D is the image 2D?
+     */
+    private void processImageAsync(Player player, String filename, int maxDimension, int maxDepth, String orientation, boolean is2D) {
+        Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {
+            BufferedImage image;
+            try {
+                image = ImageIO.read(new File(PixelPaste.getInstance().getDataFolder() + "/pixelart/" + filename));
+                image = is2D ? ImageUtil.resizeImage2D(image, maxDimension) : ImageUtil.resizeImage3D(image, maxDimension);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            BukkitRunnable runnable = is2D ? pixelBuilder.process2D(image, player) : pixelBuilder.process3D(player, image, orientation, maxDepth);
+            PendingConfirmation.addConfirmation(player, runnable);
+
+            BufferedImage finalImage = image;
+            Bukkit.getScheduler().runTaskAsynchronously(PixelPaste.getInstance(), () -> {
+                BlockManager.highlightArea(player, finalImage, player.getLocation().clone(), orientation);
+                player.sendMessage("Area highlighted. Type 'ppconfirm' to proceed with building, 'ppcancel' to cancel.");
+            });
+        });
     }
 
 }

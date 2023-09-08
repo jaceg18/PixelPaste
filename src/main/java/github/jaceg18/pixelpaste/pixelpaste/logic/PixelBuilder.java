@@ -21,29 +21,24 @@ public class PixelBuilder {
      * @param player The player pasting
      * @return A runnable method that will be called on confirmation
      */
-    public BukkitRunnable process2D(BufferedImage image, Player player){
+    public BukkitRunnable process2D(BufferedImage image, Player player) {
         int startX = player.getLocation().getBlockX();
         int startY = player.getLocation().getBlockY();
         int startZ = player.getLocation().getBlockZ();
+
         return new BukkitRunnable() {
-            int x, z = 0;
+            int x = 0, z = 0;
             final int blocksPerTick = MathUtil.gcd(image.getWidth(), image.getHeight());
+
             @Override
             public void run() {
                 for (int localX = 0; localX < blocksPerTick; localX++) {
                     for (int localZ = 0; localZ < blocksPerTick; localZ++) {
-                        // Additional checks to ensure the loop doesn't go out of bounds
                         if (x + localX >= image.getWidth() || z + localZ >= image.getHeight()) {
                             cancel();
                             return;
                         }
-
-                        int color = image.getRGB(x + localX, z + localZ);
-                        Material blockType = BlockManager.getColorBlock(color);
-
-                        Block block = player.getWorld().getBlockAt(startX + x + localX, startY, startZ + z + localZ);
-
-                        block.setType(blockType);
+                        setBlockType(image, player, x + localX, z + localZ, startX, startY, startZ);
                     }
                 }
                 x += blocksPerTick;
@@ -115,6 +110,23 @@ public class PixelBuilder {
                 }
             }
         };
+    }
+
+    /**
+     * Helper method for processing
+     * @param image Image to process
+     * @param player Player processing the image
+     * @param x x position
+     * @param z y position
+     * @param startX starting x position
+     * @param startY starting y position
+     * @param startZ starting z position
+     */
+    private void setBlockType(BufferedImage image, Player player, int x, int z, int startX, int startY, int startZ) {
+        int color = image.getRGB(x, z);
+        Material blockType = BlockManager.getColorBlock(color);
+        Block block = player.getWorld().getBlockAt(startX + x, startY, startZ + z);
+        block.setType(blockType);
     }
 
 
