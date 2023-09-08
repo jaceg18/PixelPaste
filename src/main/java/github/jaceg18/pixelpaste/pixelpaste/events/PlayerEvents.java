@@ -1,5 +1,6 @@
 package github.jaceg18.pixelpaste.pixelpaste.events;
 
+import github.jaceg18.pixelpaste.pixelpaste.logic.BlockManager;
 import github.jaceg18.pixelpaste.pixelpaste.player.PendingConfirmation;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -23,15 +24,19 @@ public class PlayerEvents implements Listener {
         if ("ppconfirm".equalsIgnoreCase(message)) {
             boolean success = PendingConfirmation.confirmAndRun(player);
             if (success) {
+                BlockManager.restoreOriginalBlocks(player);
+                PendingConfirmation.removeOriginalBlocks(player.getUniqueId());
                 player.sendMessage(ChatColor.GOLD + "PixelPaste: Building started!");
+                e.setCancelled(true);
             }
         } else if ("ppcancel".equalsIgnoreCase(message)) {
-            PendingConfirmation.removeConfirmation(player);
-            if (player.isOp() || player.hasPermission("pixelpaste") && PendingConfirmation.hasPendingConfirmation(player)) {
+            if ((player.isOp() || player.hasPermission("pixelpaste")) && PendingConfirmation.hasPendingConfirmation(player)) {
                 player.sendMessage(ChatColor.GOLD + "PixelPaste: You have canceled your build query.");
+                PendingConfirmation.removeConfirmation(player);
+                BlockManager.restoreOriginalBlocks(player);
+                PendingConfirmation.removeOriginalBlocks(player.getUniqueId());
+                e.setCancelled(true);
             }
         }
-
-        e.setCancelled(true);
     }
 }

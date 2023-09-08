@@ -25,23 +25,20 @@ public class PixelBuilder {
         int startX = player.getLocation().getBlockX();
         int startY = player.getLocation().getBlockY();
         int startZ = player.getLocation().getBlockZ();
-
-        BufferedImage finalImage = image;
         return new BukkitRunnable() {
             int x, z = 0;
-            final int blocksPerTick = MathUtil.gcd(finalImage.getWidth(), finalImage.getHeight());
-
+            final int blocksPerTick = MathUtil.gcd(image.getWidth(), image.getHeight());
             @Override
             public void run() {
                 for (int localX = 0; localX < blocksPerTick; localX++) {
                     for (int localZ = 0; localZ < blocksPerTick; localZ++) {
                         // Additional checks to ensure the loop doesn't go out of bounds
-                        if (x + localX >= finalImage.getWidth() || z + localZ >= finalImage.getHeight()) {
+                        if (x + localX >= image.getWidth() || z + localZ >= image.getHeight()) {
                             cancel();
                             return;
                         }
 
-                        int color = finalImage.getRGB(x + localX, z + localZ);
+                        int color = image.getRGB(x + localX, z + localZ);
                         Material blockType = BlockManager.getColorBlock(color);
 
                         Block block = player.getWorld().getBlockAt(startX + x + localX, startY, startZ + z + localZ);
@@ -50,10 +47,10 @@ public class PixelBuilder {
                     }
                 }
                 x += blocksPerTick;
-                if (x >= finalImage.getWidth()) {
+                if (x >= image.getWidth()) {
                     x = 0;
                     z += blocksPerTick;
-                    if (z >= finalImage.getHeight()) {
+                    if (z >= image.getHeight()) {
                         cancel();
                     }
                 }

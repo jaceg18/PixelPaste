@@ -92,7 +92,7 @@ public class CommandHandler {
                     PendingConfirmation.addConfirmation(player, runnable);
 
                     // Highlight the area
-                    highlightTask(player, finalImage, initialLocation, "horz");
+                    BlockManager.highlightArea(player, finalImage, initialLocation, "horz");
 
                     // Notify the player to confirm
                     player.sendMessage(ChatColor.GOLD + "PixelPaste: Area highlighted. Type /ppconfirm to proceed with building, /ppcancel to cancel");
@@ -151,37 +151,14 @@ public class CommandHandler {
                     PendingConfirmation.addConfirmation(player, runnable);
 
                     // Highlight the area
-                    highlightTask(player, finalImage, initialLocation, orientation);
+                    BlockManager.highlightArea(player, finalImage, initialLocation, orientation);
 
                     // Notify the player to confirm
-                    player.sendMessage(ChatColor.GOLD + "PixelPaste: Area highlighted. Type /ppconfirm to proceed with building, /ppcancel to cancel");
+                    player.sendMessage(ChatColor.GOLD + "PixelPaste: Area highlighted. Type 'ppconfirm' to proceed with building, 'ppcancel' to cancel");
                 });
             });
         }
         return true;
-    }
-    /**
-     * Schedules a task to highlight the pixel art area until a confirmation is received.
-     *
-     * @param player The player who initiated the command.
-     * @param image The image to be transformed into pixel art.
-     * @param initialLocation The starting point for the pixel art.
-     * @param orientation The orientation ("vert" or "horz") of the pixel art.
-     */
-    private void highlightTask(Player player, BufferedImage image, Location initialLocation, String orientation){
-        BukkitRunnable highlightTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (PendingConfirmation.hasPendingConfirmation(player)){
-                    BlockManager.highlightArea(player, image, initialLocation, orientation);
-                } else {
-                   this.cancel();
-                }
-
-            }
-        };
-        // Run this task repeatedly until stopped
-        highlightTask.runTaskTimer(PixelPaste.getInstance(), 0L, 20L); // 20 ticks = 1 second
     }
 
 }

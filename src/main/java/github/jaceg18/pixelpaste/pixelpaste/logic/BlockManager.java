@@ -1,16 +1,17 @@
 package github.jaceg18.pixelpaste.pixelpaste.logic;
 
+import github.jaceg18.pixelpaste.PixelPaste;
 import github.jaceg18.pixelpaste.pixelpaste.player.PendingConfirmation;
 import github.jaceg18.pixelpaste.pixelpaste.utility.MathUtil;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class BlockManager {
 
@@ -116,36 +117,56 @@ public class BlockManager {
         World world = initialLocation.getWorld();
         HashMap<Location, Material> original = new HashMap<>();
 
-        if ("vert".equals(orientation)) {
-            // Vertical
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    Location loc = new Location(world, startX + x, startY + y, startZ);
-                    original.put(loc, loc.getBlock().getType());
-                    if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
-                        loc.getBlock().setType(Material.GLASS);
-                    } else {
-                        loc.getBlock().setType(Material.AIR);
+        // Schedule a synchronous task to modify blocks
+        Bukkit.getScheduler().runTask(PixelPaste.getInstance(), () -> {
+            if ("vert".equals(orientation)) {
+                // Vertical
+                for (int x = 0; x < width; x++) {
+                    for (int y = 0; y < height; y++) {
+                        Location loc = new Location(world, startX + x, startY + y, startZ);
+                        original.put(loc, loc.getBlock().getType());
+                        if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+                            loc.getBlock().setType(Material.GLASS);
+                        } else {
+                            loc.getBlock().setType(Material.AIR);
+                        }
+                    }
+                }
+            } else {
+                // Horizontal
+                for (int x = 0; x < width; x++) {
+                    for (int z = 0; z < height; z++) {
+                        Location loc = new Location(world, startX + x, startY, startZ + z);
+                        original.put(loc, loc.getBlock().getType());
+                        if (x == 0 || x == width - 1 || z == 0 || z == height - 1) {
+                            loc.getBlock().setType(Material.GLASS);
+                        } else {
+                            loc.getBlock().setType(Material.AIR);
+                        }
                     }
                 }
             }
-        } else {
-            // Horizontal
-            for (int x = 0; x < width; x++) {
-                for (int z = 0; z < height; z++) {
-                    Location loc = new Location(world, startX + x, startY, startZ + z);
-                    original.put(loc, loc.getBlock().getType());
-                    if (x == 0 || x == width - 1 || z == 0 || z == height - 1) {
-                        loc.getBlock().setType(Material.GLASS);
-                    } else {
-                        loc.getBlock().setType(Material.AIR);
-                    }
-                }
+
+            // Store original blocks
+            PendingConfirmation.storeOriginalBlocks(player.getUniqueId(), original);
+        });
+    }
+
+
+
+    public static void restoreOriginalBlocks(Player player) {
+        UUID playerId = player.getUniqueId();
+        HashMap<Location, Material> originalBlocks = PendingConfirmation.getOriginalBlocks(playerId);
+
+        Bukkit.getScheduler().runTask(PixelPaste.getInstance(), () -> {
+            for (Map.Entry<Location, Material> entry : originalBlocks.entrySet()) {
+                Location loc = entry.getKey();
+                Material originalMaterial = entry.getValue();
+                loc.getBlock().setType(originalMaterial);
             }
-        }
+        });
 
-        // Store original blocks
-        PendingConfirmation.storeOriginalBlocks(player.getUniqueId(), original);
-
+        // Remove the stored blocks to free up memory
+        PendingConfirmation.removeOriginalBlocks(playerId);
     }
 }
