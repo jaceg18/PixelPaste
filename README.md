@@ -1,30 +1,32 @@
 # PixelPaste for Minecraft
+Transforming your images into Minecraft blocks with precision and performance!
+
 ## Overview
-PixelPaste is a powerful yet lightweight plugin for Minecraft servers, designed to accurately convert any given image into Minecraft blocks. Built with Java, this plugin takes advantage of strong mathematical algorithms to ensure a pixel-perfect representation of your images in the Minecraft world.
+PixelPaste is an advanced yet lightweight Minecraft server plugin, meticulously crafted to convert any image into pixel-perfect Minecraft blocks. Developed in Java, the plugin harnesses the power of specialized mathematical algorithms to guarantee an accurate and resource-friendly conversion of your favorite images into the world of Minecraft.
 
-## Features
-#### Lightweight: 
-- Minimal impact on server performance.
-#### Strong Mathematical Algorithms: 
-- Utilizes advanced algorithms like GCD (Greatest Common Divisor) for block placement optimization.
-#### High Accuracy:
--  Converts images into Minecraft blocks with high accuracy, minimizing color variance.
-#### Flexible: 
-- Works with any size of the image, automatically resizing larger images without losing the aspect ratio.
-#### 3D rendering and depth:
-- Now available in 3D
+## 🌟 Features
+#### 🚀 Lightweight
+ - Designed to be lean, ensuring the plugin has minimal impact on server performance.
+#### 🛠️ Strong Mathematical Algorithms
+- Incorporates algorithms, including Greatest Common Divisor (GCD), for optimized block placement.
+#### 🎨 High Accuracy
+- Delivers a high-fidelity transformation of images into Minecraft blocks, maintaining minimal color discrepancies.
+#### 🔄 Flexible
+- Adapts to images of any size, automatically resizing larger images without compromising the aspect ratio.
+#### 🌐 3D Rendering and Depth
+- Elevate your Minecraft experience with our new 3D rendering capabilities.
+## 💻 Installation
+- Download the plugin from [spigot](https://www.spigotmc.org/resources/pixelpaste-%EF%B8%8F.112531/) or build directly from the repository.
+- Move the downloaded file into your server's plugin folder.
+- Restart your server for the changes to take effect.
+## 🛠️ Usage
+- Upon installation, the plugin auto-generates two folders: PixelPaste for 2D images and PixelPaste3D for 3D images.
+- Place your PNG or JPG files in these folders.
+- Execute the following commands for conversions:
+- For 2D: /p2d filename.PNG
+- For 3D: /p3d filename.png/.jpg vert/horz max_dims max_depth
+## 🔄 Updates
+- For the latest updates and fixes, visit Spigot Updates.
 
-## Installation
-- Install from link here [[Download](https://www.spigotmc.org/resources/pixelpaste.112531/)] (or build from repo)
-- Place in plugins folder
-- Restart server
-
-## Usage
-- This plugin will automatically generate two folders called PixelPaste and PixelPaste3D. Put in PNG or JPG images in inner folders for use.
-- For 2D run the command /p2d filename.PNG
-- For 3D run the command /p3d filename.png/.jpg vert/horz max_dims max_depth
- 
-[Updates](https://www.spigotmc.org/resources/pixelpaste.112531/updates)
-
-- This video is outdated...
-[Demo Video](https://youtu.be/cJWXCN86Dbk)
+### 📺 Demo Video
+- 🚨 Note: [This Demo Video](https://www.spigotmc.org/resources/pixelpaste-%EF%B8%8F.112531/) is outdated. However, it provides a good introduction to the plugin's basic functionalities.
